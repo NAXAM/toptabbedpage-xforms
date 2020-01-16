@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
@@ -17,6 +18,9 @@ namespace SignKeys.Controls.Droid
     public class TopTabbedPageRenderer : TabbedPageRenderer
     {
         protected TabLayout TopTabLayout { get; private set; }
+        float[] tabWidths;
+        float maxTabWidth;
+
         public TopTabbedPageRenderer(Context context) : base(context)
         {
         }
@@ -26,8 +30,15 @@ namespace SignKeys.Controls.Droid
             var currentResource = FormsAppCompatActivity.TabLayoutResource;
             FormsAppCompatActivity.TabLayoutResource = Resource.Layout.TopTabbar;
             TopTabLayout = null;
+            tabWidths = null;
+            maxTabWidth = 0;
             base.OnElementChanged(e);
             FormsAppCompatActivity.TabLayoutResource = currentResource;
+            if (e.OldElement is TabbedPage oldPage)
+            {
+                oldPage.ChildAdded -= OnChildAdded;
+                oldPage.ChildRemoved -= OnChildRemoved;
+            }
             if (e.NewElement is TopTabbedPage page)
             {
                 TopTabLayout = ViewGroup.FindChildOfType<TabLayout>();
@@ -48,9 +59,27 @@ namespace SignKeys.Controls.Droid
                 {
                     TopTabLayout.SetSelectedTabIndicatorColor(page.SelectedTabColor.ToAndroid());
                 }
-                UpdateTabDistribution(page.FillTabsEqually) ;
+                page.ChildAdded += OnChildAdded;
+                page.ChildRemoved += OnChildRemoved;
                 TopTabLayout.TabIndicatorFullWidth = page.IsHighlighterFullWidth;
+                ResetTabDistribution();
             }
+        }
+
+        private void OnChildRemoved(object sender, ElementEventArgs e)
+        {
+            ResetTabDistribution();
+        }
+
+        private void OnChildAdded(object sender, ElementEventArgs e)
+        {
+            ResetTabDistribution();
+        }
+
+        void ResetTabDistribution()
+        {
+            CalculateTabsWidth();
+            UpdateTabDistribution(((TopTabbedPage)Element).FillTabsEqually, Width) ;
         }
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -71,7 +100,7 @@ namespace SignKeys.Controls.Droid
             }
             else if (e.PropertyName == TopTabbedPage.FillTabsEquallyProperty.PropertyName)
             {
-                UpdateTabDistribution(page.FillTabsEqually);
+                UpdateTabDistribution(page.FillTabsEqually, Width);
             }
             else if (e.PropertyName == TopTabbedPage.IsHighlighterFullWidthProperty.PropertyName)
             {
@@ -82,98 +111,120 @@ namespace SignKeys.Controls.Droid
         protected override void OnLayout(bool changed, int l, int t, int r, int b)
         {
             base.OnLayout(changed, l, t, r, b);
-            if (Device.Idiom == TargetIdiom.Tablet && null != TopTabLayout)
+            //if (Device.Idiom == TargetIdiom.Tablet && null != TopTabLayout)
+            //{
+            //    UpdateTabsWidthOnTablet(r - l);
+            //}
+            if (r - l != calculatedWidth && Element is TopTabbedPage page)
             {
-                UpdateTabsWidthOnTablet(r - l);
+                UpdateTabDistribution(page.FillTabsEqually, r - l);
             }
         }
 
-        void UpdateTabsWidthOnTablet(int containerWidth)
+        void UpdateTabDistribution(bool equalWidth, int containerWidth)
         {
-            if (containerWidth == calculatedWidth) return;
+            var count = TopTabLayout.TabCount;
+            if (null == tabWidths || tabWidths.Length != count)
+            {
+                CalculateTabsWidth();
+            }
             calculatedWidth = containerWidth;
+            var totalWidth = equalWidth ? maxTabWidth * count : tabWidths.Sum();
+            float ratio = 1;
+            if (containerWidth > totalWidth)
+            {
+                ratio = (float)containerWidth / (float)totalWidth;
+            }
+            var slidingTabStrip = (ViewGroup)TopTabLayout.GetChildAt(0);
+            var i = 0;
+            while (i < count)
+            {
+                var tab = slidingTabStrip.GetChildAt(i);
+                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
+                layoutParams.Weight = 1;
+                layoutParams.Width = (int)Math.Ceiling(equalWidth ? maxTabWidth : tabWidths[i] * ratio);
+                tab.LayoutParameters = layoutParams;
+                i++;
+            }
+        }
+
+        void CalculateTabsWidth()
+        {
             var slidingTabStrip = (ViewGroup)TopTabLayout.GetChildAt(0);
             var count = TopTabLayout.TabCount;
             var i = 0;
-            float totalWidth = 0;
-            var widths = new float[count];
+            tabWidths = new float[count];
+            maxTabWidth = 0;
+            var padding = (float)Context.FromPixels(40);
             while (i < count)
             {
-                var padding = (float)Context.FromPixels(40);
-
                 var tab = slidingTabStrip.GetChildAt(i);
                 if (tab is TabLayout.TabView tv)
                 {
                     if (tv.ChildCount >= 2 && tv.GetChildAt(1) is TextView textView)
                     {
                         var w = (float)Context.ToPixels(Measure(textView)) + padding;
-                        totalWidth += w;
-                        widths[i] = w;
+                        tabWidths[i] = w;
+                        if (w > maxTabWidth)
+                        {
+                            maxTabWidth = w;
+                        }
                     }
                     else
                     {
                         var w = (float)Context.FromPixels(Measure(tv.Tab.Text)) + padding;
-                        totalWidth += w;
-                        widths[i] = w;
+                        tabWidths[i] = w;
+                        if (w > maxTabWidth)
+                        {
+                            maxTabWidth = w;
+                        }
                     }
                 }
                 i++;
             }
-            i = 0;
-            float ratio = 1;
-            if (containerWidth > totalWidth)
-            {
-                ratio = (float)containerWidth / (float)totalWidth;
-            }
-            while (i < count)
-            {
-                var tab = slidingTabStrip.GetChildAt(i);
-                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
-                layoutParams.Weight = 1;
-                layoutParams.Width = (int)Math.Ceiling(widths[i] * ratio);
-                tab.LayoutParameters = layoutParams;
-                i++;
-            }
         }
+      
+       
+       
 
-        void UpdateTabDistribution(bool equalWidth)
-        {
-            if (Device.Idiom == TargetIdiom.Tablet)
-            {
-                UpdateTabsWidthOnTablet(Width);
-            }
-            else
-            {
-                var slidingTabStrip = (ViewGroup)TopTabLayout.GetChildAt(0);
-                var count = TopTabLayout.TabCount;
-                var i = 0;
-                TopTabLayout.TabMode = TabLayout.ModeScrollable;
-                if (equalWidth)
-                {
-                    while (i < count)
-                    {
-                        var tab = slidingTabStrip.GetChildAt(i);
-                        i++;
-                        var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
-                        layoutParams.Weight = 1;
-                        layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
-                        tab.LayoutParameters = layoutParams;
-                    }
-                }
-                else
-                {
-                    while (i < count)
-                    {
-                        var tab = slidingTabStrip.GetChildAt(i);
-                        i++;
-                        var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
-                        layoutParams.Weight = 1;
-                        layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
-                        tab.LayoutParameters = layoutParams;
-                    }
-                }
-            }
-        }
+        //void UpdateTabDistribution(bool equalWidth)
+        //{
+        //    if (Device.Idiom == TargetIdiom.Tablet)
+        //    {
+        //        UpdateTabsWidthOnTablet(Width);
+        //    }
+        //    else
+        //    {
+        //        var slidingTabStrip = (ViewGroup)TopTabLayout.GetChildAt(0);
+        //        var count = TopTabLayout.TabCount;
+        //        var i = 0;
+        //        TopTabLayout.TabMode = TabLayout.ModeScrollable;
+        //        if (equalWidth)
+        //        {
+        //            while (i < count)
+        //            {
+        //                var tab = slidingTabStrip.GetChildAt(i);
+        //                i++;
+        //                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
+        //                layoutParams.Weight = 1;
+        //                layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
+        //                tab.LayoutParameters = layoutParams;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            while (i < count)
+        //            {
+        //                var tab = slidingTabStrip.GetChildAt(i);
+        //                i++;
+        //                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
+        //                layoutParams.Weight = 1;
+        //                layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
+        //                tab.LayoutParameters = layoutParams;
+        //            }
+        //        }
+        //    }
+        //}
 
         public static int Measure(TextView textView)
         {
@@ -193,6 +244,19 @@ namespace SignKeys.Controls.Droid
             {
                 Text = text
             });
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Element != null)
+                {
+                    Element.ChildAdded -= OnChildAdded;
+                    Element.ChildRemoved -= OnChildRemoved;
+                }
+            }
+            base.Dispose(disposing);
         }
     }
 

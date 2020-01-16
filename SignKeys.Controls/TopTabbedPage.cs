@@ -8,7 +8,8 @@ namespace SignKeys.Controls
     public class TopTabbedPage : Xamarin.Forms.TabbedPage
     {
         /// <summary>
-        /// Not work on Android
+        /// By default, the tabs are layouted with equal spacing.
+        /// Enabling FillTabsEqually will make the tabs have the same width (width of the longest tab 
         /// </summary>
         public static readonly BindableProperty FillTabsEquallyProperty = BindableProperty.Create(
             nameof(FillTabsEqually),
@@ -46,7 +47,6 @@ namespace SignKeys.Controls
             set { SetValue(IsHighlighterFullWidthProperty, value); }
         }
 
-        //Don't know why Xamarin 
         //public static readonly BindableProperty HighlighterAnimationDurationProperty = BindableProperty.Create(
         //    nameof(HighlighterAnimationDuration),
         //    typeof(int),

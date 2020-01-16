@@ -10,7 +10,7 @@ namespace TopTabbedPageDemo
         {
             InitializeComponent();
 
-            MainPage = new MyPage();
+            MainPage = new NavigationPage(new MyPage());
         }
 
         protected override void OnStart()

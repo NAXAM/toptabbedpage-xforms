@@ -103,20 +103,6 @@ namespace SignKeys.Controls.iOS
             }
         }
 
-        //public override void ViewWillLayoutSubviews()
-        //{
-        //    base.ViewWillLayoutSubviews();
-        //    var tabSize = 44.0f;
-        //    if (UIApplication.SharedApplication.StatusBarOrientation.IsLandscape())
-        //    {
-        //        tabSize = 32.0f;
-        //    }
-        //    var tabFrame = TabBar.Frame;
-        //    tabFrame.Height = tabSize;
-        //    tabFrame.Location = CGPoint.Empty;
-        //    TabBar.Frame = tabFrame;
-        //}
-
         protected override void OnElementChanged(VisualElementChangedEventArgs e)
         {
             if (e.OldElement is TopTabbedPage oldPage)

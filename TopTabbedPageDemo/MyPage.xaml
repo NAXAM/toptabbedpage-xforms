@@ -6,6 +6,9 @@
     xmlns:local="clr-namespace:TopTabbedPageDemo"
     x:Class="TopTabbedPageDemo.MyPage"
     BarBackgroundColor="AliceBlue">
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Text="Toggle tabs" Clicked="ToggleDistribution"/>
+    </TabbedPage.ToolbarItems>
     <ContentPage
         Title="Config">
         <StackLayout
@@ -49,4 +52,8 @@
         Title="Long title" />
     <local:MainPage
         Title="Short" />
+    <local:MainPage
+        Title="Very long title" />
+    <local:MainPage
+        Title="S"/>
 </controls:TopTabbedPage>
