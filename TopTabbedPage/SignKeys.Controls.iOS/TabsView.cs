@@ -6,7 +6,7 @@ using CoreGraphics;
 using Foundation;
 using UIKit;
 
-namespace SignKeys.Controls.iOS
+namespace SignKeys.Controls.Platform.iOS
 {
     public class TabsView: UIScrollView
     {

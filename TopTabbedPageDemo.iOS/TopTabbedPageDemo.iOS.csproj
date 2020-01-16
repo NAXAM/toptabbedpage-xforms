@@ -235,9 +235,9 @@
       <Project>{CB21FE32-A531-4B46-86CA-D3E9ABE35A3E}</Project>
       <Name>TopTabbedPageDemo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SignKeys.Controls\SignKeys.Controls.iOS\SignKeys.Controls.iOS.csproj">
+    <ProjectReference Include="..\TopTabbedPage\SignKeys.Controls.iOS\SignKeys.Controls.Platform.iOS.csproj">
       <Project>{353E3105-AB20-4DF8-B2B3-1726C8979C27}</Project>
-      <Name>SignKeys.Controls.iOS</Name>
+      <Name>SignKeys.Controls.Platform.iOS</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

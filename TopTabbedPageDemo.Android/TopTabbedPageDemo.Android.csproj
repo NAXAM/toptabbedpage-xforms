@@ -92,9 +92,9 @@
       <Project>{CB21FE32-A531-4B46-86CA-D3E9ABE35A3E}</Project>
       <Name>TopTabbedPageDemo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SignKeys.Controls\SignKeys.Controls.Droid\SignKeys.Controls.Droid.csproj">
+    <ProjectReference Include="..\TopTabbedPage\SignKeys.Controls.Droid\SignKeys.Controls.Platform.Droid.csproj">
       <Project>{D2555E6D-F14E-4A70-B429-DB635F375114}</Project>
-      <Name>SignKeys.Controls.Droid</Name>
+      <Name>SignKeys.Controls.Platform.Droid</Name>
     </ProjectReference>
   </ItemGroup>
  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

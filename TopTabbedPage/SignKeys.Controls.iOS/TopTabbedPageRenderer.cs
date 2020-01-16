@@ -4,14 +4,14 @@ using System.ComponentModel;
 using System.Linq;
 using CoreGraphics;
 using SignKeys.Controls;
-using SignKeys.Controls.iOS;
+using SignKeys.Controls.Platform.iOS;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
 
 [assembly: ExportRenderer(typeof(TopTabbedPage), typeof(TopTabbedPageRenderer))]
-namespace SignKeys.Controls.iOS
+namespace SignKeys.Controls.Platform.iOS
 {
     public class TopTabbedPageRenderer : TabbedRenderer
     {
@@ -20,7 +20,7 @@ namespace SignKeys.Controls.iOS
         UIView tabsViewContainer;
         NSLayoutConstraint tabsViewContainerHeighContraint;
 
-        public static void Init()
+        public static void Preserve()
         {
             var now = DateTimeOffset.Now;
         }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <!-- Required elements-->
+        <id>SignKeys.Controls.TopTabbedPage</id>
+       <version>1.0.0</version>
+        <authors>SignKeys</authors>
+        <owners>SIGNKEYS COMPANY LIMITED</owners>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <title>SignKeys - TopTabbedPage for Xamarin.Forms</title>
+        <description>TabbedPage with tab bar on top for Xamarin.Forms</description>
+        <releaseNotes>First release</releaseNotes>
+        <copyright>Copyright (c) 2020 SignKeys</copyright>
+        <licenseUrl>https://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/NAXAM/toptabbedpage-xforms</projectUrl>
+        <iconUrl>https://avatars1.githubusercontent.com/u/25535951</iconUrl>
+        <tags>Xamarin.Forms, Xamarin.iOS, toptabbedpage, toptabs, top-tabbed-page, top-tabs</tags>
+        <dependencies>
+            <group>
+                <dependency id="Xamarin.Forms" version="4.4.0.99126" />
+            </group>
+        </dependencies>
+    </metadata>
+    <!-- Optional 'files' node -->
+    <files>
+        <!--PCL-->
+        <file src="TopTabbedPage/SignKeys.Controls/bin/Release/SignKeys.Controls.dll" target="lib/netstandard2.0/SignKeys.Controls.dll" />
+
+        <!--Android-->
+        <file src="TopTabbedPage/SignKeys.Controls/bin/Release/SignKeys.Controls.dll" target="lib/netstandard2.0/SignKeys.Controls.dll" />
+        <file src="TopTabbedPage/SignKeys.Controls.Droid/bin/Release/SignKeys.Controls.Droid.dll" target="lib/MonoAndroid10/SignKeys.Controls.Droid.dll" />
+
+        <!--iOS-->
+        <file src="TopTabbedPage/SignKeys.Controls/bin/Release/SignKeys.Controls.dll" target="lib/netstandard2.0/SignKeys.Controls.dll" />
+        <file src="TopTabbedPage/SignKeys.Controls.iOS/bin/Release/SignKeys.Controls.iOS.dll" target="lib/Xamarin.iOS10/SignKeys.Controls.iOS.dll" />
+    </files>
+</package>

@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Views;
 
-namespace SignKeys.Controls.Droid
+namespace SignKeys.Controls.Platform.Droid
 {
     public static class ViewGroupExtensions
     {

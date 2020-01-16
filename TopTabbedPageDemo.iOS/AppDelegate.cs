@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
-using SignKeys.Controls.iOS;
+using SignKeys.Controls.Platform.iOS;
 using UIKit;
 
 namespace TopTabbedPageDemo.iOS
@@ -23,7 +23,7 @@ namespace TopTabbedPageDemo.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            new TopTabbedPageRenderer();
+            TopTabbedPageRenderer.Preserve();
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
 

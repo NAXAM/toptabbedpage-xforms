@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{a52b8a63-bc84-4b47-910d-692533484892}</TemplateGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SignKeys.Controls.iOS</RootNamespace>
+    <RootNamespace>SignKeys.Controls.Platform.iOS</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>SignKeys.Controls.iOS</AssemblyName>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
@@ -51,7 +51,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SignKeys.Controls.csproj">
+    <ProjectReference Include="..\SignKeys.Controls\SignKeys.Controls.csproj">
       <Project>{7BC36343-B7B8-472E-9E5C-F8FE594C9DBF}</Project>
       <Name>SignKeys.Controls</Name>
     </ProjectReference>

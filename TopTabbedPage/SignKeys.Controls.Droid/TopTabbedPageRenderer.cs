@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Android.Content;
@@ -7,19 +6,24 @@ using Android.Support.Design.Widget;
 using Android.Views;
 using Android.Widget;
 using SignKeys.Controls;
-using SignKeys.Controls.Droid;
+using SignKeys.Controls.Platform.Droid;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using Xamarin.Forms.Platform.Android.AppCompat;
 
-[assembly:ExportRenderer(typeof(TopTabbedPage), typeof(TopTabbedPageRenderer))]
-namespace SignKeys.Controls.Droid
+[assembly: ExportRenderer(typeof(TopTabbedPage), typeof(TopTabbedPageRenderer))]
+namespace SignKeys.Controls.Platform.Droid
 {
     public class TopTabbedPageRenderer : TabbedPageRenderer
     {
         protected TabLayout TopTabLayout { get; private set; }
         float[] tabWidths;
         float maxTabWidth;
+
+        public static void Preserve()
+        {
+            var now = DateTimeOffset.Now;
+        }
 
         public TopTabbedPageRenderer(Context context) : base(context)
         {
@@ -111,10 +115,6 @@ namespace SignKeys.Controls.Droid
         protected override void OnLayout(bool changed, int l, int t, int r, int b)
         {
             base.OnLayout(changed, l, t, r, b);
-            //if (Device.Idiom == TargetIdiom.Tablet && null != TopTabLayout)
-            //{
-            //    UpdateTabsWidthOnTablet(r - l);
-            //}
             if (r - l != calculatedWidth && Element is TopTabbedPage page)
             {
                 UpdateTabDistribution(page.FillTabsEqually, r - l);
@@ -155,7 +155,7 @@ namespace SignKeys.Controls.Droid
             var i = 0;
             tabWidths = new float[count];
             maxTabWidth = 0;
-            var padding = (float)Context.FromPixels(40);
+            var padding = (float)Context.FromPixels(48);
             while (i < count)
             {
                 var tab = slidingTabStrip.GetChildAt(i);
@@ -184,48 +184,6 @@ namespace SignKeys.Controls.Droid
             }
         }
       
-       
-       
-
-        //void UpdateTabDistribution(bool equalWidth)
-        //{
-        //    if (Device.Idiom == TargetIdiom.Tablet)
-        //    {
-        //        UpdateTabsWidthOnTablet(Width);
-        //    }
-        //    else
-        //    {
-        //        var slidingTabStrip = (ViewGroup)TopTabLayout.GetChildAt(0);
-        //        var count = TopTabLayout.TabCount;
-        //        var i = 0;
-        //        TopTabLayout.TabMode = TabLayout.ModeScrollable;
-        //        if (equalWidth)
-        //        {
-        //            while (i < count)
-        //            {
-        //                var tab = slidingTabStrip.GetChildAt(i);
-        //                i++;
-        //                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
-        //                layoutParams.Weight = 1;
-        //                layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
-        //                tab.LayoutParameters = layoutParams;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            while (i < count)
-        //            {
-        //                var tab = slidingTabStrip.GetChildAt(i);
-        //                i++;
-        //                var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
-        //                layoutParams.Weight = 1;
-        //                layoutParams.Width = LinearLayout.LayoutParams.WrapContent;
-        //                tab.LayoutParameters = layoutParams;
-        //            }
-        //        }
-        //    }
-        //}
-
         public static int Measure(TextView textView)
         {
             var text = textView.Text;

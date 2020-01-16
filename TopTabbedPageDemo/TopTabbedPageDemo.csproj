@@ -10,6 +10,6 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SignKeys.Controls\SignKeys.Controls.csproj" />
+    <ProjectReference Include="..\TopTabbedPage\SignKeys.Controls\SignKeys.Controls.csproj" />
   </ItemGroup>
 </Project>
