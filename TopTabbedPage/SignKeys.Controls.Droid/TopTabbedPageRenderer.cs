@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Linq;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.Design.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Widget;
 using SignKeys.Controls;
@@ -19,6 +21,9 @@ namespace SignKeys.Controls.Platform.Droid
         protected TabLayout TopTabLayout { get; private set; }
         float[] tabWidths;
         float maxTabWidth;
+        Typeface tabTypeFace = Typeface.Default;
+        float tabFontSize = 15;
+        TextPaint textPaint;
 
         public static void Preserve()
         {
@@ -27,6 +32,7 @@ namespace SignKeys.Controls.Platform.Droid
 
         public TopTabbedPageRenderer(Context context) : base(context)
         {
+
         }
 
         protected override void OnElementChanged(ElementChangedEventArgs<TabbedPage> e)
@@ -35,7 +41,10 @@ namespace SignKeys.Controls.Platform.Droid
             FormsAppCompatActivity.TabLayoutResource = Resource.Layout.TopTabbar;
             TopTabLayout = null;
             tabWidths = null;
+            tabTypeFace = Typeface.Default;
             maxTabWidth = 0;
+            tabFontSize = 15;
+            calculatedWidth = 0;
             base.OnElementChanged(e);
             FormsAppCompatActivity.TabLayoutResource = currentResource;
             if (e.OldElement is TabbedPage oldPage)
@@ -66,7 +75,40 @@ namespace SignKeys.Controls.Platform.Droid
                 page.ChildAdded += OnChildAdded;
                 page.ChildRemoved += OnChildRemoved;
                 TopTabLayout.TabIndicatorFullWidth = page.IsHighlighterFullWidth;
+                tabTypeFace = GetTypefaceFromFontFamily(page.TabFontFamily) ?? Typeface.Default;
+                if (page.TabFontSize > 0)
+                {
+                    tabFontSize = (float)page.TabFontSize;
+                }
+                UpdateTextPaint();
                 ResetTabDistribution();
+            }
+        }
+
+        void UpdateTextPaint()
+        {
+            textPaint = new TextPaint()
+            {
+                TextSize = Context.ToPixels(tabFontSize)
+            };
+            textPaint.SetTypeface(tabTypeFace);
+        }
+
+        Typeface GetTypefaceFromFontFamily(string fontFamily)
+        {
+            if (string.IsNullOrEmpty(fontFamily)) return null;
+            var sharpIndex = fontFamily.IndexOf("#", StringComparison.Ordinal);
+            try
+            {
+                var filePath = fontFamily.Substring(0, sharpIndex);
+                var font = Typeface.CreateFromAsset(Context.Assets, filePath);
+                return font;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("[TopTabbedPage - Exception] " + e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                return null;
             }
         }
 
@@ -88,7 +130,6 @@ namespace SignKeys.Controls.Platform.Droid
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            calculatedWidth = 0;
             base.OnElementPropertyChanged(sender, e);
             if (TopTabLayout == null || !(Element is TopTabbedPage page)) return;
             if (e.PropertyName == TopTabbedPage.ShadowedTabbarProperty.PropertyName)
@@ -110,7 +151,28 @@ namespace SignKeys.Controls.Platform.Droid
             {
                 TopTabLayout.TabIndicatorFullWidth = page.IsHighlighterFullWidth;
             }
+            else if (e.PropertyName == TopTabbedPage.TabFontSizeProperty.PropertyName)
+            {
+                float newSize = page.TabFontSize > 0 ? (float)page.TabFontSize : 15;
+                if (Math.Abs(newSize - tabFontSize) > float.Epsilon)
+                {
+                    tabFontSize = newSize;
+                    UpdateTextPaint();
+                    ResetTabDistribution();
+                }
+            }
+            else if (e.PropertyName == TopTabbedPage.TabFontFamilyProperty.PropertyName)
+            {
+                var newTypeFace = GetTypefaceFromFontFamily(page.TabFontFamily) ?? Typeface.Default;
+                if (newTypeFace != tabTypeFace)
+                {
+                    tabTypeFace = newTypeFace;
+                    UpdateTextPaint();
+                    ResetTabDistribution();
+                }
+            }
         }
+
         int calculatedWidth = 0;
         protected override void OnLayout(bool changed, int l, int t, int r, int b)
         {
@@ -143,9 +205,12 @@ namespace SignKeys.Controls.Platform.Droid
                 var layoutParams = tab.LayoutParameters as LinearLayout.LayoutParams;
                 layoutParams.Weight = 1;
                 layoutParams.Width = (int)Math.Ceiling(equalWidth ? maxTabWidth : tabWidths[i] * ratio);
+                var text = ((TabLayout.TabView)tab).Tab.Text;
+                System.Diagnostics.Debug.WriteLine($"Allocated: {text} {layoutParams.Width}");
                 tab.LayoutParameters = layoutParams;
                 i++;
             }
+            TopTabLayout.RequestLayout();
         }
 
         void CalculateTabsWidth()
@@ -155,30 +220,38 @@ namespace SignKeys.Controls.Platform.Droid
             var i = 0;
             tabWidths = new float[count];
             maxTabWidth = 0;
-            var padding = (float)Context.FromPixels(48);
+            var padding = (float)Context.ToPixels(48);
             while (i < count)
             {
                 var tab = slidingTabStrip.GetChildAt(i);
                 if (tab is TabLayout.TabView tv)
                 {
+                    int extraPadding = 0;
                     if (tv.ChildCount >= 2 && tv.GetChildAt(1) is TextView textView)
                     {
-                        var w = (float)Context.ToPixels(Measure(textView)) + padding;
+                        textView.SetTypeface(tabTypeFace, TypefaceStyle.Normal);
+                        extraPadding = textView.PaddingStart + textView.PaddingEnd;
+                        //if (tabFontSize > 0)
+                        //{
+                        //    textView.SetTextSize(Android.Util.ComplexUnitType.Sp, tabFontSize);
+                        //}
+                        //var w = (float)Context.ToPixels(Measure(textView));
+                        //w += padding;
+                        //tabWidths[i] = w;
+                        //if (w > maxTabWidth)
+                        //{
+                        //    maxTabWidth = w;
+                        //}
+                    }
+                    //else
+                    //{
+                    var w = (float)Context.ToPixels(Measure(tv.Tab.Text)) + padding + (float)Context.ToPixels(extraPadding);
                         tabWidths[i] = w;
                         if (w > maxTabWidth)
                         {
                             maxTabWidth = w;
                         }
-                    }
-                    else
-                    {
-                        var w = (float)Context.FromPixels(Measure(tv.Tab.Text)) + padding;
-                        tabWidths[i] = w;
-                        if (w > maxTabWidth)
-                        {
-                            maxTabWidth = w;
-                        }
-                    }
+                    //}
                 }
                 i++;
             }
@@ -191,17 +264,40 @@ namespace SignKeys.Controls.Platform.Droid
             var bounds = new Android.Graphics.Rect();
             var textPaint = textView.Paint;
             textPaint.GetTextBounds(text, 0, text.Length, bounds);
-            int height = bounds.Height();
-            int width = bounds.Width();
-            return width;
+            //int height = bounds.Height();
+            int boundWidth = bounds.Width();
+            var measuredWidth = Math.Ceiling(textPaint.MeasureText(text));
+            return Math.Max(boundWidth, (int)measuredWidth);
         }
 
         public int Measure(string text)
         {
-            return Measure(new TextView(this.Context)
-            {
-                Text = text
-            });
+            //var textView = new TextView(this.Context)
+            //{
+            //    Text = text
+            //};
+            //textView.SetTypeface(tabTypeFace, TypefaceStyle.Normal);
+            //if (tabFontSize > 0)
+            //{
+            //    textView.SetTextSize(Android.Util.ComplexUnitType.Sp, tabFontSize);
+            //}
+            //return Measure(textView);
+            
+            var bounds = new Android.Graphics.Rect();
+            textPaint.GetTextBounds(text, 0, text.Length, bounds);
+            var boundWidth = bounds.Width();
+            var measuredWidth = (int)Math.Ceiling(textPaint.MeasureText(text));
+            var widths = new float[text.Length];
+            textPaint.GetTextWidths(text, widths);
+            var sumWidth = (int)Math.Ceiling(widths.Sum());
+            System.Diagnostics.Debug.WriteLine($"{text}: bound = {boundWidth} measured = {measuredWidth} sum = {sumWidth}");
+            return GetMax(boundWidth, measuredWidth, sumWidth);
+        }
+
+        int GetMax(params int[] values)
+        {
+            if (null == values || values.Length == 0) return int.MinValue;
+            return values.Max();
         }
 
         protected override void Dispose(bool disposing)

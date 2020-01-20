@@ -7,7 +7,9 @@
     x:Class="TopTabbedPageDemo.MyPage"
     BarBackgroundColor="AliceBlue">
     <TabbedPage.ToolbarItems>
-        <ToolbarItem Text="Toggle tabs" Clicked="ToggleDistribution"/>
+        <ToolbarItem
+            Text="Toggle tabs"
+            Clicked="ToggleDistribution" />
     </TabbedPage.ToolbarItems>
     <ContentPage
         Title="Config">
@@ -18,10 +20,34 @@
                 Clicked="ToggleDistribution" />
             <Button
                 Text="Toggle shadow"
-                Clicked="ToggleShadow"/>
+                Clicked="ToggleShadow" />
             <Button
                 Text="Toggle highlighter"
-                Clicked="ToggleHighlighter"/>
+                Clicked="ToggleHighlighter" />
+            <Button
+                Text="Change font"
+                Clicked="ChangeFont" />
+            <Label
+                Margin="16">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span
+                            Text="Fonts are from: " />
+                        <Span
+                            Text="Google's open-source fonts"
+                            TextColor="Blue"
+                            TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    x:Name="linkTapGesture"
+                                    CommandParameter="https://www.google.com/fonts" />
+                            </Span.GestureRecognizers>
+                        </Span>
+                        <Span
+                            Text="." />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
         </StackLayout>
     </ContentPage>
     <ContentPage
@@ -55,5 +81,5 @@
     <local:MainPage
         Title="Very long title" />
     <local:MainPage
-        Title="S"/>
+        Title="S" />
 </controls:TopTabbedPage>

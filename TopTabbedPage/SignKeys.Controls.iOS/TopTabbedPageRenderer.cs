@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using CoreGraphics;
 using SignKeys.Controls;
 using SignKeys.Controls.Platform.iOS;
@@ -115,6 +116,23 @@ namespace SignKeys.Controls.Platform.iOS
             {
                 newPage.PropertyChanged += OnElementPropertyChanged;
                 newPage.PagesChanged += OnPagesChanged;
+                if (false == string.IsNullOrEmpty(newPage.TabFontFamily))
+                {
+                    nfloat fontSize = TabsView.DefaultFontSize;
+                    if (newPage.TabFontSize > 0)
+                    {
+                        fontSize = (nfloat)newPage.TabFontSize;
+                    }
+                    tabsView.TitleFont = UIFont.FromName(newPage.TabFontFamily, fontSize);
+                }
+                else if (newPage.TabFontSize > 0)
+                {
+                    tabsView.TitleFont = UIFont.SystemFontOfSize((nfloat)newPage.TabFontSize);
+                }
+                else
+                {
+                    tabsView.TitleFont = UIFont.SystemFontOfSize(TabsView.DefaultFontSize);
+                }
                 tabsView.Titles = newPage.Children.Select((p) => p.Title ?? "").ToArray();
                 tabsViewContainer.BackgroundColor = tabsView.BackgroundColor = newPage.BarBackgroundColor.ToUIColor();
                 if (false == newPage.SelectedTabColor.IsDefault)
@@ -190,6 +208,31 @@ namespace SignKeys.Controls.Platform.iOS
             else if (e.PropertyName == TopTabbedPage.IsHighlighterFullWidthProperty.PropertyName)
             {
                 tabsView.IsHighlighterFullWidth = page.IsHighlighterFullWidth;
+            }
+            else if (e.PropertyName == TopTabbedPage.TabFontFamilyProperty.PropertyName)
+            {
+                var descriptor = tabsView.TitleFont.FontDescriptor;
+                var size = descriptor.PointSize;
+                if (string.IsNullOrEmpty(page.TabFontFamily))
+                {
+                    tabsView.TitleFont = UIFont.SystemFontOfSize(size);
+                }
+                else
+                {
+                    tabsView.TitleFont = UIFont.FromName(page.TabFontFamily, size);
+                }
+            }
+            else if (e.PropertyName == TopTabbedPage.TabFontSizeProperty.PropertyName)
+            {
+                var descriptor = tabsView.TitleFont.FontDescriptor;
+                if (page.TabFontSize > 0)
+                {
+                    tabsView.TitleFont = UIFont.FromDescriptor(descriptor, (nfloat)page.TabFontSize);
+                }
+                else
+                {
+                    tabsView.TitleFont = UIFont.FromDescriptor(descriptor, TabsView.DefaultFontSize);
+                }
             }
         }
 

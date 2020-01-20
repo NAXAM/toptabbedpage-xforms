@@ -97,5 +97,11 @@
       <Name>SignKeys.Controls.Platform.Droid</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\VarelaRound-Regular.ttf" />
+    <AndroidAsset Include="Assets\Pacifico-Regular.ttf" />
+    <AndroidAsset Include="Assets\Monda-Regular.ttf" />
+    <AndroidAsset Include="Assets\LobsterTwo-Regular.ttf" />
+  </ItemGroup>
  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

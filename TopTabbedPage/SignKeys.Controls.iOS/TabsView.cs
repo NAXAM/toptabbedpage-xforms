@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using UIKit;
+using Xamarin.Forms;
 
 namespace SignKeys.Controls.Platform.iOS
 {
-    public class TabsView: UIScrollView
+    public class TabsView: UIScrollView, IObservableDisposal
     {
+        public static readonly nfloat DefaultFontSize = 15;
         public EventHandler<EventArgs> TabSelected;
+        public bool IsDisposed => isDisposed;
 
         private string[] _Titles;
         public string[] Titles
@@ -19,28 +23,32 @@ namespace SignKeys.Controls.Platform.iOS
             set
             {
                 _Titles = value;
-                UpdateTabs();
+                this.PerformOnMainThread((tv) => tv.UpdateTabs());
             }
         }
 
-        private UIFont _TitleFont = UIFont.SystemFontOfSize(15);
+        private UIFont _TitleFont = UIFont.SystemFontOfSize(DefaultFontSize);
         public UIFont TitleFont
         {
             get => _TitleFont;
             set
             {
+                if (null == value) return;
                 _TitleFont = value;
-                var iter = buttonStack.ArrangedSubviews.GetEnumerator();
-                using (iter as IDisposable)
+                this.PerformOnMainThread((tv) =>
                 {
-                    while (iter.MoveNext())
+                    var iter = tv.buttonStack.ArrangedSubviews.GetEnumerator();
+                    using (iter as IDisposable)
                     {
-                        if (iter.Current is UIButton button)
+                        while (iter.MoveNext())
                         {
-                            button.TitleLabel.Font = value;
+                            if (iter.Current is UIButton button)
+                            {
+                                button.TitleLabel.Font = tv._TitleFont;
+                            }
                         }
                     }
-                }
+                });
             }
         }
 
@@ -51,18 +59,21 @@ namespace SignKeys.Controls.Platform.iOS
             set
             {
                 _SelectedTabColor = value;
-                var iter = buttonStack.ArrangedSubviews.GetEnumerator();
-                using (iter as IDisposable)
+                this.PerformOnMainThread((tv) =>
                 {
-                    while (iter.MoveNext())
+                    var iter = tv.buttonStack.ArrangedSubviews.GetEnumerator();
+                    using (iter as IDisposable)
                     {
-                        if (iter.Current is UIButton button)
+                        while (iter.MoveNext())
                         {
-                            button.SetTitleColor(_SelectedTabColor, UIControlState.Disabled);
+                            if (iter.Current is UIButton button)
+                            {
+                                button.SetTitleColor(tv._SelectedTabColor, UIControlState.Disabled);
+                            }
                         }
                     }
-                }
-                highlighter.BackgroundColor = _SelectedTabColor.CGColor;
+                    tv.highlighter.BackgroundColor = tv._SelectedTabColor.CGColor;
+                });
             }
         }
 
@@ -73,18 +84,20 @@ namespace SignKeys.Controls.Platform.iOS
             set
             {
                 _UnselectedTabColor = value;
-                var iter = buttonStack.ArrangedSubviews.GetEnumerator();
-                using (iter as IDisposable)
+                this.PerformOnMainThread((tv) =>
                 {
-                    while (iter.MoveNext())
+                    var iter = tv.buttonStack.ArrangedSubviews.GetEnumerator();
+                    using (iter as IDisposable)
                     {
-                        if (iter.Current is UIButton button)
+                        while (iter.MoveNext())
                         {
-                            button.SetTitleColor(_UnselectedTabColor, UIControlState.Normal);
+                            if (iter.Current is UIButton button)
+                            {
+                                button.SetTitleColor(tv._UnselectedTabColor, UIControlState.Normal);
+                            }
                         }
                     }
-                }
-                //TODO;
+                });
             }
         }
 
@@ -153,6 +166,7 @@ namespace SignKeys.Controls.Platform.iOS
             }
         }
 
+
         private NSLayoutConstraint tabHeightConstraint;
         private NSLayoutConstraint tabBottomConstraint;
         private bool isDisposed = false;
@@ -192,6 +206,7 @@ namespace SignKeys.Controls.Platform.iOS
         {
             SetupButtonStack();
         }
+
 
         public override void LayoutSubviews()
         {

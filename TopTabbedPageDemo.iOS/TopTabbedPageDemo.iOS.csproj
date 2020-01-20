@@ -240,4 +240,10 @@
       <Name>SignKeys.Controls.Platform.iOS</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\VarelaRound-Regular.ttf" />
+    <BundleResource Include="Resources\Pacifico-Regular.ttf" />
+    <BundleResource Include="Resources\Monda-Regular.ttf" />
+    <BundleResource Include="Resources\LobsterTwo-Regular.ttf" />
+  </ItemGroup>
 </Project>

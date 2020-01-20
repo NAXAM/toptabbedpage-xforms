@@ -47,6 +47,30 @@ namespace SignKeys.Controls
             set { SetValue(IsHighlighterFullWidthProperty, value); }
         }
 
+        public static readonly BindableProperty TabFontFamilyProperty = BindableProperty.Create(
+            nameof(TabFontFamily),
+            typeof(string),
+            typeof(TopTabbedPage),
+            default(string),
+            BindingMode.OneWay);
+        public string TabFontFamily
+        {
+            get { return (string)GetValue(TabFontFamilyProperty); }
+            set { SetValue(TabFontFamilyProperty, value); }
+        }
+
+        public static readonly BindableProperty TabFontSizeProperty = BindableProperty.Create(
+            nameof(TabFontSize),
+            typeof(double),
+            typeof(TopTabbedPage),
+            default(double),
+            BindingMode.OneWay);
+        public double TabFontSize
+        {
+            get { return (double)GetValue(TabFontSizeProperty); }
+            set { SetValue(TabFontSizeProperty, value); }
+        }
+
         //public static readonly BindableProperty HighlighterAnimationDurationProperty = BindableProperty.Create(
         //    nameof(HighlighterAnimationDuration),
         //    typeof(int),
