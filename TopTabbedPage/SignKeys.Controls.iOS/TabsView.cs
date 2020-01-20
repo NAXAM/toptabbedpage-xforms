@@ -400,6 +400,9 @@ namespace SignKeys.Controls.Platform.iOS
             {
                 var buttonFrame = buttons[index + 1].Frame;
                 var newFrame = new CGRect(buttonFrame.X, buttonFrame.Height, buttonFrame.Width, _HighlighterHeight);
+                var visibleRect = buttonFrame;
+                visibleRect.X = (nfloat)Math.Max(0, buttonFrame.X - 30);
+                visibleRect.Width = (nfloat)(Math.Min(buttonFrame.GetMaxX() + 30, ContentSize.Width)) - visibleRect.X;
                 if (false == _IsHighlighterFullWidth && ((UIButton)buttons[index + 1]).TitleLabel is UILabel label)
                 {
                     var posX = label.Frame.X;
@@ -412,6 +415,7 @@ namespace SignKeys.Controls.Platform.iOS
                     newFrame.X = posX;
                     newFrame.Size = new CGSize(label.Frame.Size.Width, _HighlighterHeight);
                 }
+                ScrollRectToVisible(visibleRect, animated);
                 if (animated)
                 {
                     UIView.Animate(0.2, () =>

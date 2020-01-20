@@ -249,8 +249,6 @@ publish/
 # in these scripts will be unencrypted
 PublishScripts/
 
-# NuGet Packages
-*.nupkg
 # The packages folder can be ignored because of Package Restore
 **/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
@@ -404,3 +402,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 mono_crash.mem.*.blob
+mono_crash.*.json
